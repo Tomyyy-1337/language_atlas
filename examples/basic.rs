@@ -8,10 +8,10 @@ enum Language {
 
 generate_language_functions! {
     LanguageEnum: Language
-    greeting { 
-        English: "Hello" 
+    greeting {
+        English: "Hello"
         Spanish: "Hola"
-        French:  "Bonjour" 
+        French:  "Bonjour"
     }
     farewell(name) {
         English: "Goodbye, {name}"
@@ -20,7 +20,7 @@ generate_language_functions! {
     }
     calculate(a, b, c) {
         English: "{a} + {b} = {c}"
-    }   
+    }
 }
 
 fn main() {

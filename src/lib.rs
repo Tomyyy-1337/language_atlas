@@ -1,45 +1,28 @@
 /// This macro genrerates functions for a given enum that return language variants of a String.
 /// The generatiated functions can take parameters that implement `std::fmt::Display`.
-/// 
+///
 /// # Notes
 /// - The first language variant is considered the default value.
 /// - If a language variant is not provided for a field, the default value is used.
 /// - If no language string is provided for a field, a deprecated function returning "ToDo!" is generated. The function signature stays the same.
 /// - Parameter funtions return a `String` type, while non-parameter functions return a `&'static str` type.
 ///
-/// # Syntax
-/// ```rust,ignore
-/// generate_language_functions! {
-///     LanguageEnum: EnumName
-///     field_name_1 { lang1: "value1", lang2: "value2", ... }
-///     field_name_2(arg1, arg2) { lang1: "value1: {arg1}, {arg2}", lang2: "value2: {arg1}, {arg2}", ... }
-///     ...
-/// }
-/// ```
-///
-/// # Parameters
-/// - `LanguageEnum`: The name of the enum for which the functions are generated.
-/// - `field_name`: The name of the function to be generated.
-/// - `lang1`, `lang2`, ...: The language variants of the enum.
-/// - `value1`, `value2`, ...: The string values corresponding to each language variant.
-/// - `arg1`, `arg2`, ...: The arguments for the function if it takes any.
-/// 
 /// # Example
 /// ```rust
 /// use language_atlas::generate_language_functions;
-/// 
+///
 /// enum Language {
 ///     English,
 ///     Spanish,
 ///     French,
 /// }
-/// 
+///
 /// generate_language_functions! {
 ///     LanguageEnum: Language
-///     greeting { 
-///         English: "Hello" 
+///     greeting {
+///         English: "Hello"
 ///         Spanish: "Hola"
-///         French:  "Bonjour" 
+///         French:  "Bonjour"
 ///     }
 ///     farewell(name) {
 ///         English: "Goodbye, {name}"
@@ -50,13 +33,13 @@
 ///         English: "{a} + {b} = {c}"
 ///     }   
 /// }
-/// 
+///
 /// fn main() {
 ///     let lang = Language::English;
 ///     assert_eq!(lang.greeting(), "Hello");
 ///     assert_eq!(lang.farewell("John"), "Goodbye, John");
 ///     assert_eq!(lang.calculate(1, 2, 3), "1 + 2 = 3");
-/// 
+///
 ///     let lang = Language::Spanish;
 ///     assert_eq!(lang.greeting(), "Hola");
 ///     assert_eq!(lang.farewell("Juan"), "Adiós, Juan");
@@ -64,14 +47,14 @@
 /// }
 /// ```
 /// # Expands to
-/// 
-/// ```rust	
-///     enum Language {
+///
+/// ```rust
+/// enum Language {
 ///     English,
 ///     Spanish,
 ///     French,
 /// }
-/// 
+///
 /// #[allow(unreachable_patterns)]
 /// #[allow(non_camel_case_types)]
 /// impl Language {
@@ -104,7 +87,7 @@
 macro_rules! generate_language_functions {
     (
         LanguageEnum: $enum_name:ident
-        $($field:ident $( ( $($args:ident),+ ) )? { 
+        $($field:ident $( ( $($args:ident),+ ) )? {
             $($lang:ident: $value:expr $(,)? )*
         })*
     ) => {
@@ -124,9 +107,9 @@ macro_rules! generate_language_functions {
         }
     };
 
-    (@field_impl $enum_name:ident $field:ident { 
-        $first_lang:ident: $first_value:expr, 
-        $($lang:ident: $value:expr,)* 
+    (@field_impl $enum_name:ident $field:ident {
+        $first_lang:ident: $first_value:expr,
+        $($lang:ident: $value:expr,)*
     }) => {
         pub fn $field(&self) -> &'static str {
             match self {
@@ -139,16 +122,16 @@ macro_rules! generate_language_functions {
     (@field_impl $enum_name:ident $field:ident ( $($args:ident),* ) { } ) => {
         #[deprecated(note = "No language string provided for this field. Defaulting to 'ToDo!'")]
         pub fn $field<$( $args: std::fmt::Display, )*>(
-            &self, 
+            &self,
             $( $args: $args, )*
         ) -> String {
             String::from("ToDo!")
         }
     };
 
-    (@field_impl $enum_name:ident $field:ident ( $($args:ident),* ) { 
-        $first_lang:ident: $first_value:expr, 
-        $($lang:ident: $value:expr,)* 
+    (@field_impl $enum_name:ident $field:ident ( $($args:ident),* ) {
+        $first_lang:ident: $first_value:expr,
+        $($lang:ident: $value:expr,)*
     } ) => {
         pub fn $field<$( $args: std::fmt::Display, )*>(
             &self,
