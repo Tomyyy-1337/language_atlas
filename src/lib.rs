@@ -1,11 +1,14 @@
+mod test;
+
 /// This macro genrerates functions for a given enum that return language variants of a String.
 /// The generatiated functions can take parameters that implement `std::fmt::Display`.
 ///
 /// # Notes
 /// - The first language variant is considered the default value.
 /// - If a language variant is not provided for a field, the default value is used.
-/// - If no language string is provided for a field, a deprecated function returning "ToDo!" is generated. The function signature stays the same.
+/// - If no language string is provided for a field, a deprecated function returning “ToDo!” is generated. The function signature stays the same.
 /// - Parameter functions return a `String` type, while non-parameter functions return a `&'static str` type.
+/// - The types of parameters are optional. If no types are provided, the parameters have to implement the `Display` trait.
 ///
 /// # Example
 /// ```rust
@@ -124,7 +127,7 @@ macro_rules! generate_language_functions {
         }
     };
 
-    (@field_impl $enum_name:ident $field:ident ( $($args:ident ),* ) { } ) => {
+    (@field_impl $enum_name:ident $field:ident ( $($args:ident ),+ ) { } ) => {
         #[deprecated(note = "No language string provided for this field. Defaulting to 'ToDo!'")]
         pub fn $field<$( $args: std::fmt::Display, )*>(
             &self,
@@ -158,7 +161,7 @@ macro_rules! generate_language_functions {
 
     (@field_impl $enum_name:ident $field:ident ( $($args:ident),+ ) {
         $first_lang:ident: $first_value:expr,
-        $($lang:ident: $value:expr,)+
+        $($lang:ident: $value:expr,)*
     } ) => {
         pub fn $field<$( $args: std::fmt::Display, )*>(
             &self,
@@ -170,7 +173,7 @@ macro_rules! generate_language_functions {
 
     (@field_impl $enum_name:ident $field:ident ( $($args:ident $args_type:ty ),+ ) {
         $first_lang:ident: $first_value:expr,
-        $($lang:ident: $value:expr,)+
+        $($lang:ident: $value:expr,)*
     } ) => {
         pub fn $field(
             &self,

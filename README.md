@@ -7,7 +7,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-language_atlas = "0.1.0"
+language_atlas = "0.1.2"
 ```
 
 ## Notes
